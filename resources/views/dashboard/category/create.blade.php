@@ -59,11 +59,11 @@
                                 <th scope="row">{{ $loop->iteration }}</th>
                                 <td>{{$category->name??''}}</td>
                                 <td>{{($category->status?'Active':'Inactive')}}</td>
-                                <td>
+                                <td class="d-flex ">
                                     <x-button type="button" class="edit-category-btn" category-id="{{ $category->id }}" category-status="{{ $category->status }}" category-name="{{ $category->name }}" variant="primary">
                                         Edit
                                     </x-button>
-                                   <form action="{{ route('categories.destroy', $category->id) }}" method="POST">
+                                   <form class="ml-2" action="{{ route('categories.destroy', $category->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
 

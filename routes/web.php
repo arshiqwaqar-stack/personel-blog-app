@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('articles',ArticleController::class);
     //Category Route
     Route::resource('categories',CategoryController::class);
+    //Tag Route
+    Route::resource('tags',TagController::class);
 
 });
 

@@ -10,4 +10,7 @@ class Article extends Model
 {
     use HasFactory,SoftDeletes;
     protected $guareded = [] ;
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
 }

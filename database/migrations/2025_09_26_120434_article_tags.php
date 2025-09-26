@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
+        Schema::create('article_tags', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable(false);
-            $table->text('description')->nullable(false);
-            $table->string('image')->nullable(true);
-            $table->char('category_id')->nullable(false);
-            $table->softDeletes()->nullable(true);
+            $table->char('article_id')->nullable();
+            $table->char('tag_id')->nullable();
+            $table->softDeletes();
             $table->timestamps();
+
         });
     }
 
@@ -27,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('articles');
+        Schema::table('article_tags', function (Blueprint $table) {
+            //
+        });
     }
 };

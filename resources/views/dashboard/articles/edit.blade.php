@@ -8,18 +8,19 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('articles.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('articles.update',[$article->id]) }}" enctype="multipart/form-data">
                     @csrf
+                    @method('PATCH')
 
                     <div>
                         <x-input-label for="name" :value="__('Title')" />
-                        <x-text-input id="name" class="block mt-1 w-full" type="text" name="title" :value="old('title')" required autofocus autocomplete="name" />
+                        <x-text-input id="name" class="block mt-1 w-full" type="text" name="title" :value="old('title',$article->title)" required autofocus autocomplete="name" />
                         <x-input-error :messages="$errors->get('title')" class="mt-2" />
                     </div>
 
                     <div class="mt-4">
                         <x-input-label for="description" :value="__('Description')" />
-                        <x-text-input id="description" class="block mt-1 w-full" type="text" name="description" :value="old('description')" required />
+                        <x-text-input id="description" class="block mt-1 w-full" type="text" name="description" :value="old('description',$article->description)" required />
                         <x-input-error :messages="$errors->get('description')" class="mt-2" />
                     </div>
                     <div class="mt-4">
@@ -29,26 +30,14 @@
                             class="block mt-1 w-full "
                             name="category" 
                             :options="$categories" 
-                            selected="editor"
+                            selected="$article->category_id"
                         />
 
-                        <x-input-error :messages="$errors->get('category')" class="mt-2" />
-                    </div>
-                    <div class="mt-4">
-                        <x-input-label for="tags" :value="__('Tags')" />
-                        <x-select 
-                            id="tags"
-                            class="block mt-1 w-full "
-                            name="tag_id" 
-                            :options="$tags" 
-                            selected=""
-                        />
-
-                        <x-input-error :messages="$errors->get('tags')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
                     </div>
                     <div class="mt-4">
                         <x-input-label for="password" :value="__('Image')" />
-
+                        <img height="200px" width="200px" src="{{ asset('storage/website/'.$article->image) }}">
                         <x-text-input id="password" class="block mt-1 w-full"
                                         type="file"
                                         name="image"
@@ -60,9 +49,9 @@
 
                     <div class="flex items-center justify-end mt-4">
 
-                        <x-primary-button class="ms-4">
-                            {{ __('Create') }}
-                        </x-primary-button>
+                        <x-button class="ms-4 m-2" type="submit" variant="primary">
+                            {{ __('Update') }}
+                        </x--button>
                     </div>
                 </form>
             </div>
