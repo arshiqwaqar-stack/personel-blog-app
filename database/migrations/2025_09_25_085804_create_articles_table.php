@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title')->nullable(false);
             $table->text('description')->nullable(false);
             $table->string('image')->nullable(true);
-            $table->char('category_id')->nullable(false);
+            $table->foreignId('category_id')->nullable(false);
             $table->softDeletes()->nullable(true);
             $table->timestamps();
         });

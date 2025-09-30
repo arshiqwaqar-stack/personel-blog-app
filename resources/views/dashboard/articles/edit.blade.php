@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('articles.update',[$article->id]) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('articles.update',[$article]) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
 
@@ -28,12 +28,25 @@
                         <x-select 
                             id="category"
                             class="block mt-1 w-full "
-                            name="category" 
+                            name="category_id" 
                             :options="$categories" 
                             selected="$article->category_id"
                         />
 
-                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
+                    </div>
+                    <div class="mt-4">
+                        <x-input-label for="tag" :value="__('Tags')" />
+                        <x-select 
+                            id="tag"
+                            class="block mt-1 w-full "
+                            name="tag_id[]" 
+                            :options="$tags" 
+                            selected="$article->tags->pluck('id')->toArray()"
+                            customattributes="multiple"
+                        />
+
+                        <x-input-error :messages="$errors->get('tag_id')" class="mt-2" />
                     </div>
                     <div class="mt-4">
                         <x-input-label for="password" :value="__('Image')" />

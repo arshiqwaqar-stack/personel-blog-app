@@ -10,9 +10,5 @@ use Illuminate\Support\Facades\Storage;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
-    public function storeImage($folder,$image){
-        $folder = str_replace(" ","_",$folder);
-        $path = Storage::disk("articles")->put($folder, $image);
-        return $path;
-    }
+    
 }

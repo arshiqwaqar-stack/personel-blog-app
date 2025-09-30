@@ -44,7 +44,7 @@
             <h1 class="text-white">Categories</h1>
         </div>
          <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <table class="table">
+                <table class="table data-table">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -53,32 +53,7 @@
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse($categories as $category)
-                            <tr>
-                                <th scope="row">{{ $loop->iteration }}</th>
-                                <td>{{$category->name??''}}</td>
-                                <td>{{($category->status?'Active':'Inactive')}}</td>
-                                <td class="d-flex ">
-                                    <x-button type="button" class="edit-category-btn" category-id="{{ $category->id }}" category-status="{{ $category->status }}" category-name="{{ $category->name }}" variant="primary">
-                                        Edit
-                                    </x-button>
-                                   <form class="ml-2" action="{{ route('categories.destroy', $category->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <x-button type="submit" variant="danger">
-                                            Delete
-                                        </x-button>
-                                    </form>
-
-
-                                </td>
-                            </tr>
-                        @empty
-
-                        @endforelse
-                        
+                    <tbody>    
                     </tbody>
                 </table>
             </div>
@@ -130,11 +105,29 @@
 
     $('#editCategoryForm').attr('action', url);
     $('#category-name').val(cat_name);
-     $('#edit-cat-status').val(cat_status).change();
+    $('#edit-cat-status').val(cat_status).change();
 
     $('#editCategoryModal').modal('show');
 });
 
+</script>
+<script>
+    $(document).ready(function () {
+        
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('categories.create') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                // {data: 'id', name: 'id'},
+                {data: 'name', name: 'name'},
+                {data: 'status', name: 'status'},
+                {data: 'action', name: 'action', orderable: false, searchable: false},
+            ]
+        });
+        $('.dataTables_filter input').attr('placeholder', 'Search categories...');
+    });
 </script>
 @endpush
 </x-app-layout>

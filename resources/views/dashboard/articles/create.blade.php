@@ -27,7 +27,7 @@
                         <x-select 
                             id="category"
                             class="block mt-1 w-full "
-                            name="category" 
+                            name="category_id" 
                             :options="$categories" 
                             selected="editor"
                         />
@@ -39,12 +39,13 @@
                         <x-select 
                             id="tags"
                             class="block mt-1 w-full "
-                            name="tag_id" 
+                            name="tag_id[]" 
                             :options="$tags" 
                             selected=""
+                            customattributes="multiple='true'"
                         />
 
-                        <x-input-error :messages="$errors->get('tags')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('tag_id')" class="mt-2" />
                     </div>
                     <div class="mt-4">
                         <x-input-label for="password" :value="__('Image')" />

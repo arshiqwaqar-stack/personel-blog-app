@@ -9,4 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ArticleTag extends Model
 {
     use HasFactory,SoftDeletes;
+    public function tagName(){
+        return $this->hasOne(Tag::class,"id","tag_id");
+    }
 }

@@ -9,11 +9,11 @@
         <div>
             <h1 class="text-white">Categories</h1>
         </div>
-         <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <x-button class="float-right m-2" type="button" href="{{ route('tags.create') }}" variant="primary">
                     Add Tags
             </x-button>
-                <table class="table">
+         <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <table class="table data-table">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -31,10 +31,10 @@
                                 <td>{{$tag->category->name??''}}</td>
                                 <td>{{($tag->status?'Active':'Inactive')}}</td>
                                 <td class="d-flex ">
-                                    <x-button type="button" class="edit-tag-btn" tag-id="{{ $tag->id }}" tag-status="{{ $tag->status }}" tag-name="{{ $tag->name }}" variant="primary">
+                                    <x-button type="button" class="edit-tag-btn" data-url="{{ route('tags.update', $tag) }}" category-id="{{ $tag->category_id }}" tag-status="{{ $tag->status }}" tag-name="{{ $tag->name }}" variant="primary">
                                         Edit
                                     </x-button>
-                                   <form class="ml-2" action="{{ route('tags.destroy', $tag->id) }}" method="POST">
+                                   <form class="ml-2" action="{{ route('tags.destroy', $tag) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
 
@@ -71,20 +71,20 @@
                         <input type="text" name="name" id="tag-name" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <x-input-label for="edit-cat-status" :value="__('tag Status')" />
+                        <x-input-label for="edit-tag-status" :value="__('tag Status')" />
                         <x-select
                             name="status"
-                            id="edit-cat-status"
+                            id="edit-tag-status"
                             :options="['1'=>'Active','0'=>'Inactive']"
                             selected=""
                         />
                     </div>
                     <div class="mb-3">
-                        <x-input-label for="edit-cat-status" :value="__('Category')" />
+                        <x-input-label for="edit-tag-cat" :value="__('Category')" />
                         <x-select
                             name="category_id"
-                            id="edit-cat-status"
-                            :options="$tags->pluck('name','id')"
+                            id="edit-tag-cat"
+                            :options="$categories"
                             selected=""
                         />
                     </div>
@@ -102,21 +102,40 @@
 <script>
     $(document).on('click', '.edit-tag-btn', function () {
     var selected_btn = $(this);
-    var cat_id = selected_btn.attr('tag-id');
+    // var cat_id = selected_btn.attr('tag-id');
     var cat_name = selected_btn.attr('tag-name');
     var cat_status = selected_btn.attr('tag-status');
     var tag_category = selected_btn.attr('category-id');
-    var url = '{{ route("tags.update", ":id") }}';
-    url = url.replace(':id', cat_id);
-
+    var url = selected_btn.attr('data-url');
+    // url = url.replace(':id', cat_id);
     $('#edittagForm').attr('action', url);
     $('#tag-name').val(cat_name);
-     $('#edit-cat-status').val(cat_status).change();
-     $('#edit-tag-category').val(tag_category).change();
+    $('#edit-tag-status').val(cat_status).change();
+    $('#edit-tag-cat').val(tag_category).change();
 
     $('#edittagModal').modal('show');
 });
 
+</script>
+<script>
+    $(document).ready(function () {
+        
+        var table = $('.data-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('tags.index') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                // {data: 'id', name: 'id'},
+                {data: 'name', name: 'name'},
+                {data: 'category', name: 'category'},
+                {data: 'status', name: 'status'},
+                {data: 'action', name: 'action', orderable: false, searchable: false},
+            ]
+        });
+        
+        $('.dataTables_filter input').attr('placeholder', 'Search tags...');
+    });
 </script>
 @endpush
 </x-app-layout>

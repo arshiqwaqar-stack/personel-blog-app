@@ -34,7 +34,7 @@
                             name="status"
                             id="edit-cat-status"
                             :options="['1'=>'Active','0'=>'Inactive']"
-                            selected=""
+                            selected="1"
                         />
                     </div>
 
