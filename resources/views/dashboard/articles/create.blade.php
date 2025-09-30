@@ -38,7 +38,7 @@
                         <x-input-label for="tags" :value="__('Tags')" />
                         <x-select 
                             id="tags"
-                            class="block mt-1 w-full "
+                            class="block mt-1 w-full select-two"
                             name="tag_id[]" 
                             :options="$tags" 
                             selected=""

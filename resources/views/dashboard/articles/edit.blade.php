@@ -39,10 +39,10 @@
                         <x-input-label for="tag" :value="__('Tags')" />
                         <x-select 
                             id="tag"
-                            class="block mt-1 w-full "
+                            class="block mt-1 w-full select-two "
                             name="tag_id[]" 
                             :options="$tags" 
-                            selected="$article->tags->pluck('id')->toArray()"
+                            selected="{{$article->tags->pluck('id')}}"
                             customattributes="multiple"
                         />
 

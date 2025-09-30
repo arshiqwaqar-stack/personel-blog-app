@@ -5,7 +5,7 @@
 
     <select name="{{ $name }}" id="{{ $id }}" {{ $attributes->merge(['class' => 'form-select']) }} {!! $customattributes !!}>
         @foreach($options as $value => $text)
-            <option value="{{ $value }}" {{ $selected == $value ? 'selected' : '' }}>
+            <option value="{{ $value }}"  {{ $selected == $value ? 'selected' : '' }} >
                 {{ $text }}
             </option>
         @endforeach

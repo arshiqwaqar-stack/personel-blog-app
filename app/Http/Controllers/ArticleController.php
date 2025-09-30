@@ -15,6 +15,7 @@ class ArticleController extends Controller
 {
     public function __construct(){
         $this->middleware("auth");
+        $this->middleware("role:admin")->except(["index","show"]);
     }
     /**
      * Display a listing of the resource.
@@ -22,38 +23,43 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $articles = Article::query();
+        $user = auth()->user();
+
         if ($request->ajax()) {
             return DataTables::of($articles)
                 ->addIndexColumn()
-                ->addColumn("image", function ($article) {
-                    $path = asset("storage/website/" . ($article->image ?? ""));
-                    return '<img src="'.$path.'" height="100" width="100" alt="Article Image">';
-                })
-                ->addColumn('action', function($article){
-                    $viewUrl   = route('articles.show', $article->id);
-                    $editUrl   = route('articles.edit', $article->id);
-                    $deleteUrl = route('articles.destroy', $article->id);
+                ->addColumn("image", fn($article) =>
+                    '<img src="'.asset("storage/website/" . ($article->image ?? "")).'" height="100" width="100" alt="Article Image">'
+                )
+                ->addColumn('action', function($article) use ($user) {
+                    $viewUrl = route('articles.show', $article->id);
 
-                    $csrf   = csrf_field();
-                    $method = method_field('DELETE');
+                    if ($user->hasRole("admin")) {
+                        $editUrl   = route('articles.edit', $article->id);
+                        $deleteUrl = route('articles.destroy', $article->id);
+                        return '
+                            <a href="'.$viewUrl.'" class="btn btn-success btn-sm">View</a>
+                            <a href="'.$editUrl.'" class="btn btn-primary btn-sm mx-2">Edit</a>
+                            <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
+                                '.csrf_field().method_field('DELETE').'
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        ';
+                    }
 
-                    $actionBtn = '
-                        <a href="'.$viewUrl.'" class="btn btn-success btn-sm">View</a>
-                        <a href="'.$editUrl.'" class="btn btn-primary btn-sm mx-2">Edit</a>
-                        <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
-                            '.$csrf.'
-                            '.$method.'
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    ';
-                    return $actionBtn;
+                    if ($user->hasRole("user")) {
+                        return '<a href="'.$viewUrl.'" class="btn btn-success btn-sm">View</a>';
+                    }
                 })
-                
                 ->rawColumns(['action','image'])
                 ->make(true);
         }
-        return view("dashboard",compact("articles"));
+
+        return $user->hasRole("admin")
+            ? view("admin.dashboard", compact("articles"))
+            : view("user.dashboard", compact("articles"));
     }
+
 
     /**
      * Show the form for creating a new resource.
