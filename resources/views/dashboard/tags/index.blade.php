@@ -24,32 +24,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($tags as $tag)
-                            <tr>
-                                <th scope="row">{{ $loop->iteration }}</th>
-                                <td>{{$tag->name??''}}</td>
-                                <td>{{$tag->category->name??''}}</td>
-                                <td>{{($tag->status?'Active':'Inactive')}}</td>
-                                <td class="d-flex ">
-                                    <x-button type="button" class="edit-tag-btn" data-url="{{ route('tags.update', $tag) }}" category-id="{{ $tag->category_id }}" tag-status="{{ $tag->status }}" tag-name="{{ $tag->name }}" variant="primary">
-                                        Edit
-                                    </x-button>
-                                   <form class="ml-2" action="{{ route('tags.destroy', $tag) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <x-button type="submit" variant="danger">
-                                            Delete
-                                        </x-button>
-                                    </form>
-
-
-                                </td>
-                            </tr>
-                        @empty
-
-                        @endforelse
-                        
+                    
                     </tbody>
                 </table>
             </div>
@@ -123,7 +98,7 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('tags.index') }}",
+            ajax: "{{ route('api.tags.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 // {data: 'id', name: 'id'},

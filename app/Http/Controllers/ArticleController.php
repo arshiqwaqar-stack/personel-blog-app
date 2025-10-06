@@ -22,42 +22,11 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $articles = Article::query();
         $user = auth()->user();
 
-        if ($request->ajax()) {
-            return DataTables::of($articles)
-                ->addIndexColumn()
-                ->addColumn("image", fn($article) =>
-                    '<img src="'.asset("storage/website/" . ($article->image ?? "")).'" height="100" width="100" alt="Article Image">'
-                )
-                ->addColumn('action', function($article) use ($user) {
-                    $viewUrl = route('articles.show', $article->id);
-
-                    if ($user->hasRole("admin")) {
-                        $editUrl   = route('articles.edit', $article->id);
-                        $deleteUrl = route('articles.destroy', $article->id);
-                        return '
-                            <a href="'.$viewUrl.'" class="btn btn-success btn-sm">View</a>
-                            <a href="'.$editUrl.'" class="btn btn-primary btn-sm mx-2">Edit</a>
-                            <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
-                                '.csrf_field().method_field('DELETE').'
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        ';
-                    }
-
-                    if ($user->hasRole("user")) {
-                        return '<a href="'.$viewUrl.'" class="btn btn-success btn-sm">View</a>';
-                    }
-                })
-                ->rawColumns(['action','image'])
-                ->make(true);
-        }
-
         return $user->hasRole("admin")
-            ? view("admin.dashboard", compact("articles"))
-            : view("user.dashboard", compact("articles"));
+            ? view("admin.dashboard")
+            : view("user.dashboard");
     }
 
 

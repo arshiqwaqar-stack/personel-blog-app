@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('categories.store') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('api.categories.store') }}"  id="storeCategoryForm" enctype="multipart/form-data">
                     @csrf
 
                     <div class="m-2">
@@ -65,6 +65,7 @@
             <form id="editCategoryForm" method="POST">
                 @csrf
                 @method('PATCH')
+                <input type="hidden" name="category_id">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Category</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -103,31 +104,147 @@
     var url = '{{ route("categories.update", ":id") }}';
     url = url.replace(':id', cat_id);
 
-    $('#editCategoryForm').attr('action', url);
+    // $('#editCategoryForm').attr('action', url);
+    $('[name="category_id"]').val(cat_id);
     $('#category-name').val(cat_name);
     $('#edit-cat-status').val(cat_status).change();
 
     $('#editCategoryModal').modal('show');
 });
 
+
 </script>
 <script>
-    $(document).ready(function () {
+    //Using simple ajax
+    // $(document).ready(function () {
         
-        var table = $('.data-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('categories.create') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                // {data: 'id', name: 'id'},
-                {data: 'name', name: 'name'},
-                {data: 'status', name: 'status'},
-                {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
-        });
-        $('.dataTables_filter input').attr('placeholder', 'Search categories...');
+    //     var table = $('.data-table').DataTable({
+    //         processing: true,
+    //         serverSide: true,
+    //         ajax: "{{ route('categories.create') }}",
+    //         columns: [
+    //             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+    //             // {data: 'id', name: 'id'},
+    //             {data: 'name', name: 'name'},
+    //             {data: 'status', name: 'status'},
+    //             {data: 'action', name: 'action', orderable: false, searchable: false},
+    //         ]
+    //     });
+    //     $('.dataTables_filter input').attr('placeholder', 'Search categories...');
+    // });
+
+    //using axios
+    $(document).ready(function () {
+        loadCategory();        
     });
+    function loadCategory(){
+
+        if ( ! $.fn.DataTable.isDataTable('.data-table') ) {
+            var table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: function (data, callback, settings) {
+                    axios.get("{{ route('api.categories.index') }}", {
+                        params: data 
+                    })
+                    .then(function (response) {
+                        callback(response.data); 
+                    })
+                    .catch(function (error) {
+                        console.error("Error loading data:", error);
+                    });
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    { data: 'name', name: 'name' },
+                    { data: 'status', name: 'status' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                ]
+            });
+        } else {
+            $('.data-table').DataTable().ajax.reload(null, false); // just reload if already initialized
+        }
+
+        $('.dataTables_filter input').attr('placeholder', 'Search categories...');
+    }
+    $("#editCategoryForm").on('submit',function(e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        var cat_id = $(this).find('[name="category_id"]').val()
+        var url = '{{ route("api.categories.update", ":id") }}';
+        url = url.replace(':id', cat_id);
+        formData.append('method','PATCH')
+        var formObject = Object.fromEntries(formData.entries());
+        axios.post(url, formObject, {
+            params:formObject
+        }).then(function (response) {
+                Swal.fire({
+                icon:response.data.type,
+                text:response.data.message,
+            })
+            loadCategory();
+            $('#editCategoryModal').modal('hide');
+            })
+            .catch(function (error) {
+                Swal.fire({
+                    icon:error.response.data.type,
+                    text:error.response.data.message,
+                })
+                loadCategory();
+                // console.error("Error loading data:", error);
+            });
+    });
+
+    $("#storeCategoryForm").on('submit',function(e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        var formObject = Object.fromEntries(formData.entries());
+        axios.post("{{ route('api.categories.store') }}" , formObject, {
+            params:formObject
+        }).then(function (response) {
+                Swal.fire({
+                icon:response.data.type,
+                text:response.data.message,
+            })
+            document.getElementById("storeCategoryForm").reset();
+            loadCategory();
+            })
+            .catch(function (error) {
+                Swal.fire({
+                    icon:error.response.data.type,
+                    text:error.response.data.message,
+                })
+                loadCategory();
+                // console.error("Error loading data:", error);
+            });
+    });
+     function deleteCategory(categoryId,button) {
+        axios.delete(`/api/categories/delete/${categoryId}`, {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(function (response) {
+            Swal.fire({
+                icon:response.data.type,
+                text:response.data.message,
+            })
+            let categoryDiv = button.closest('tr');
+            if (categoryDiv) {
+                categoryDiv.remove();
+            }
+
+        })
+        .catch(function (error) {
+            if (error.response) {
+                Swal.fire({
+                    icon:error.response.data.type,
+                    text:error.response.data.message,
+                })
+                // alert("Error: " + (error.response.data.message || "Something went wrong"));
+            }
+        });
+    }
 </script>
 @endpush
 </x-app-layout>

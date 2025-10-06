@@ -23,44 +23,8 @@ class CategoryController extends Controller
      */
     public function create(Request $request)
     {
-        $categories = Category::query();
-        if ($request->ajax()) {
-            return DataTables::of($categories)
-               ->addIndexColumn() 
-               ->addColumn("status", function ($category) {
-                return $category->status == 1?"Active":"Inactive";
-               })
-                ->addColumn('action', function($category){
-                    $editBtn = '<button type="button" 
-                                    class="btn btn-primary btn-sm edit-category-btn" 
-                                    category-id="'.$category->id.'" 
-                                    category-status="'.$category->status.'" 
-                                    category-name="'.$category->name.'">
-                                    Edit
-                                </button>';
-
-                    $csrf   = csrf_field();
-                    $method = method_field('DELETE');
-                    $deleteForm = '
-                        <form class="d-inline" action="'.route('categories.destroy', $category).'" method="POST">
-                            '.$csrf.'
-                            '.$method.'
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    ';
-
-                    return $editBtn . ' ' . $deleteForm;
-                })->filterColumn('status', function ($query, $keyword) {
-                    $keyword = strtolower($keyword);
-                    if ($keyword === 'active') {
-                        $query->where('status',Category::ACTIVE);
-                    } elseif ($keyword === 'inactive') {
-                        $query->where('status', Category::INACTIVE);
-                    }
-                })->rawColumns(['action','status'])
-                ->make(true);
-        }
-        return view("dashboard.category.create",compact("categories"));
+        
+        return view("dashboard.category.create");
     }
 
     /**

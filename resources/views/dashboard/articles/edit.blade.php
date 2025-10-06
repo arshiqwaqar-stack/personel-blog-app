@@ -8,10 +8,10 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('articles.update',[$article]) }}" enctype="multipart/form-data">
+                <form  id="articleForm" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
-
+                   
                     <div>
                         <x-input-label for="name" :value="__('Title')" />
                         <x-text-input id="name" class="block mt-1 w-full" type="text" name="title" :value="old('title',$article->title)" required autofocus autocomplete="name" />
@@ -42,8 +42,8 @@
                             class="block mt-1 w-full select-two "
                             name="tag_id[]" 
                             :options="$tags" 
-                            selected="{{$article->tags->pluck('id')}}"
-                            customattributes="multiple"
+                            :selected="$article->tags->pluck('id')->toArray()"
+                            multiple
                         />
 
                         <x-input-error :messages="$errors->get('tag_id')" class="mt-2" />
@@ -70,4 +70,49 @@
             </div>
         </div>
     </div>
+    @push('js')
+<script>
+    // $(document).on('submit', '#articleForm', function(e) {
+    $('#articleForm').on('submit', function(e) {
+
+        e.preventDefault();
+        var article = '{{ $article->id }}';
+       var form  = $(this);
+       let formData = new FormData(this);
+       var temp;
+       formData.append('_method', 'PATCH'); // important!
+
+       console.log(formData);
+    //    temp = $('#tag').val().map(tag=>tag.trim()).filter(tag=>tag);
+    //    formData.append('tag_id[]',temp);
+        $.ajax({
+            // url: `/api/articles/update/${article}`,
+            url: "{{ route('api.articles.update', ':id') }}".replace(':id', article ),
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('input[name="_token"]').val()
+            },
+            success: function(response) {
+                console.log(response)
+                swal.fire({
+                    icon:response['type'],
+                    text:response['message'],
+                })
+                 $('#articleForm')[0].reset();
+                $('#tags').val(null).trigger('change');
+                $('#category').val(null).trigger('change');
+            },
+            error: function(xhr) {
+                swal.fire({
+                    icon:xhr.responseJSON.type,
+                    text:xhr.responseJSON.message,
+                })
+            }
+        });
+    });
+</script>
+@endpush
 </x-app-layout>

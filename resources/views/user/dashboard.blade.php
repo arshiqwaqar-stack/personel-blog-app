@@ -4,11 +4,6 @@
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
-    <div class="container ">
-        <x-button class="float-right m-2" type="button" href="{{ route('articles.create') }}" variant="primary">
-            Add Article
-        </x-button>
-    </div>
     <div class="py-12 ">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">

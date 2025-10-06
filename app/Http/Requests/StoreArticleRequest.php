@@ -11,6 +11,7 @@ class StoreArticleRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        
         return true;
     }
 
@@ -25,10 +26,12 @@ class StoreArticleRequest extends FormRequest
             'title'       => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required',
-            'tag_id'      => 'required|array',
+            'tag_id'    => 'required|array',
             'tag_id.*'    => 'exists:tags,id',
         ];
-         if ($this->isMethod('POST')) {
+         if ($this->is('api/*')) {
+            $rules['image'] = 'nullable|mimes:jpeg,jpg,png';
+        } elseif ($this->isMethod('POST')) {
            // For store
             $rules['image'] = 'required|mimes:jpeg,jpg,png';
         } elseif ($this->isMethod('PATCH') || $this->isMethod('PUT')) {

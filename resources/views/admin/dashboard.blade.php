@@ -35,7 +35,7 @@
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('articles.index') }}",
+            ajax: "{{ route('api.articles.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 // {data: 'id', name: 'id'},
@@ -48,6 +48,36 @@
         $('.dataTables_filter input').attr('placeholder', 'Search articles...');
         
     });
+
+    function deleteArticle(articleId,button) {
+        axios.delete(`/api/articles/delete/${articleId}`, {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(function (response) {
+            console.log(response.data);
+            Swal.fire({
+                icon:response.data.type,
+                text:response.data.message,
+            })
+            let articleDiv = button.closest('tr');
+            if (articleDiv) {
+                articleDiv.remove();
+            }
+
+        })
+        .catch(function (error) {
+            if (error.response) {
+                console.error(error.response.data);
+                Swal.fire({
+                    icon:error.response.data.type,
+                    text:error.response.data.message,
+                })
+                // alert("Error: " + (error.response.data.message || "Something went wrong"));
+            }
+        });
+    }
 </script>
 @endpush
 </x-app-layout>

@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('tags.store') }}" enctype="multipart/form-data">
+                <form method="POST" id="storeTagForm" action="{{ route('api.tags.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <div>
@@ -48,4 +48,31 @@
             </div>
         </div>
     </div>
+@push('js')
+<script>
+    $("#storeTagForm").on('submit',function(e){
+        e.preventDefault();
+        var formData = new FormData(this);
+        var formObject = Object.fromEntries(formData.entries());
+        axios.post("{{ route('api.tags.store') }}" , formObject, {
+            params:formObject
+        }).then(function (response) {
+                Swal.fire({
+                icon:response.data.type,
+                text:response.data.message,
+            })
+            document.getElementById("storeTagForm").reset();
+            loadCategory();
+            })
+            .catch(function (error) {
+                Swal.fire({
+                    icon:error.response.data.type,
+                    text:error.response.data.message,
+                })
+                loadCategory();
+                // console.error("Error loading data:", error);
+            });
+    });
+</script>
+@endpush
 </x-app-layout>

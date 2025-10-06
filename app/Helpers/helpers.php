@@ -7,3 +7,14 @@ use Illuminate\Support\Facades\Storage;
         $path = Storage::disk("articles")->put($folder, $image);
         return $path;
     }
+
+
+function returnResponse($type = null,$message= null,$code = null){
+    return response()->json(
+        [
+            "type"=> $type,
+            "message"=> $message
+        ],
+        $code
+    );
+}

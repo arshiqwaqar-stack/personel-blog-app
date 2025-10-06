@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('articles.store') }}" enctype="multipart/form-data">
+                <form  id="articleForm" enctype="multipart/form-data">
                     @csrf
 
                     <div>
@@ -61,7 +61,7 @@
 
                     <div class="flex items-center justify-end mt-4">
 
-                        <x-primary-button class="ms-4">
+                        <x-primary-button class="ms-4 submit-btn">
                             {{ __('Create') }}
                         </x-primary-button>
                     </div>
@@ -69,4 +69,37 @@
             </div>
         </div>
     </div>
+@push('js')
+<script>
+    $(document).on('submit', '#articleForm', function(e) {
+        e.preventDefault();
+
+        let form = $(this)[0];
+        let formData = new FormData(form);
+
+        $.ajax({
+            url: "{{ route('api.articles.store') }}",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                swal.fire({
+                    icon:response['type'],
+                    text:response['message'],
+                })
+                 $('#articleForm')[0].reset();
+                $('#tags').val(null).trigger('change');
+                $('#category').val(null).trigger('change');
+            },
+            error: function(xhr) {
+                swal.fire({
+                    icon:xhr.responseJSON.type,
+                    text:xhr.responseJSON.message,
+                })
+            }
+        });
+    });
+</script>
+@endpush
 </x-app-layout>
