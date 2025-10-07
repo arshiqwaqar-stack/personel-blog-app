@@ -23,12 +23,14 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
+
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
-
+        $abilities = $request->user()->hasRole('admin')?['create-categories','create-tags'] :['view-articles'];
+        $request->user()->createToken('auth_token',$abilities)->plainTextToken;
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
@@ -37,6 +39,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $request->user()->tokens()->delete();
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

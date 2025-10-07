@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Article Routes
-Route::middleware(['web','auth:web'])->prefix('articles')->group(function () {
+Route::middleware(['auth:sanctum, ability:create-categories,create-tags'])->prefix('articles')->group(function () {
 
     Route::get('/listing', [ArticleController::class, 'showCollection'])->name('api.articles.listing');  
     Route::get('/show/{id}', [ArticleController::class, 'show'])->name('api.articles.show'); 
@@ -30,7 +30,7 @@ Route::middleware(['web','auth:web'])->prefix('articles')->group(function () {
 });
 
 //Category Routes
-Route::middleware(['web','auth:web'])->prefix('categories')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('categories')->group(function () {
 
     Route::get('/index', [CategoryController::class, 'index'])->name('api.categories.index');  
     Route::post('/store', [CategoryController::class, 'store'])->name('api.categories.store'); 
@@ -39,13 +39,17 @@ Route::middleware(['web','auth:web'])->prefix('categories')->group(function () {
     
 });
 //Tag Routes
-Route::middleware(['web','auth:web'])->prefix('tags')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('tags')->group(function () {
 
     Route::get('/index', [TagController::class, 'index'])->name('api.tags.index');  
     Route::post('/store', [TagController::class, 'store'])->name('api.tags.store'); 
     Route::patch('/update/{id}', [TagController::class, 'update'])->name('api.tags.update'); 
     Route::delete('/delete/{id}', [TagController::class, 'destroy'])->name('api.tags.delete');
     
+});
+
+Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+    return $request->user();
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

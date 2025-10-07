@@ -5,6 +5,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +26,16 @@ Route::get('/', function () {
 
 
 
+Route::middleware(['auth'])->get('/generate-token', function (Request $request) {
+   $request->user()->tokens()->delete();
+
+    $token = $request->user()->createToken('API Token')->plainTextToken;
+
+    return response()->json([
+        'user' => $request->user()->only(['id', 'name', 'email']),
+        'token' => $token,
+    ]);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -38,7 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('articles',ArticleController::class);
 
     //admin route
-    Route::middleware('role:admin')->group(function () {
+    // Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['auth:sanctum, ability:create-categories,create-tags'])->group(function () {
         //Category Route
         Route::resource('categories',CategoryController::class);
         //Tag Route

@@ -26,11 +26,10 @@
 @push('js')
 <script>
     $(document).ready(function () {
-        
         var table = $('.data-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('articles.index') }}",
+            ajax: "{{ route('api.articles.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 // {data: 'id', name: 'id'},

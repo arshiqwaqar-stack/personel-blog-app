@@ -22,8 +22,8 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
+        
         $user = auth()->user();
-
         return $user->hasRole("admin")
             ? view("admin.dashboard")
             : view("user.dashboard");
